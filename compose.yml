@@ -1,0 +1,9 @@
+services:
+  memos-rss:
+    image: ghcr.io/imnyang/newsletter:latest
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./config.toml:/usr/app/config.toml
+      - /etc/localtime:/etc/localtime:ro

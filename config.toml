@@ -1,0 +1,16 @@
+imap_server = "imap.gmail.com"
+imap_port = 993
+imap_username = "newsletter.imnyang@gmail.com"
+imap_password = "clff bevg toji slvy"
+discord_webhook_url = "https://discord.com/api/webhooks/1463015024799776870/CkA_QMSOz9MIplB-zkgqqK_Blv6BBjFe-MI6KE0Nw8OANTb2jORguyQycVgmIwmuGp8b"
+
+# Ignore emails from these senders (exact match or partial match)
+ignored_senders = [
+    "no-reply@accounts.google.com"
+]
+
+# Ignore emails with these subjects (partial match)
+ignored_subjects = [
+    "Security Alert",
+    "보안"
+]
