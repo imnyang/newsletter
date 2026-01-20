@@ -3,7 +3,7 @@ FROM rust:slim as builder
 WORKDIR /usr/src/app
 COPY . .
 
-RUN apt-get update && apt-get install -y pkg-config libssl-dev perl && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y pkg-config libssl-dev perl make && rm -rf /var/lib/apt/lists/*
 RUN --mount=type=cache,target=/usr/local/cargo/registry cargo build --release
 
 FROM debian:13-slim
