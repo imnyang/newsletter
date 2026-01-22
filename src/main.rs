@@ -1,5 +1,6 @@
 use mailparse::MailHeaderMap;
 use native_tls::TlsConnector;
+use regex::Regex;
 use serde::Deserialize;
 use std::fs;
 use std::thread;
@@ -139,9 +140,21 @@ fn run_monitor(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
     }
 }
 
+fn clean_body(body: &str) -> String {
+    // Replace multiple newlines with double newline (max)
+    let re_newlines = Regex::new(r"\n{3,}").unwrap();
+    let body = re_newlines.replace_all(body, "\n\n");
+    
+    // Trim trailing spaces from each line
+    let re_trailing_spaces = Regex::new(r"(?m)[ \t]+$").unwrap();
+    let body = re_trailing_spaces.replace_all(&body, "");
+
+    body.trim().to_string()
+}
+
 fn extract_body(parsed: &mailparse::ParsedMail) -> Option<String> {
     if parsed.ctype.mimetype == "text/plain" {
-        return parsed.get_body().ok();
+        return parsed.get_body().ok().map(|s| clean_body(&s));
     }
     
     // If multipart, search for text/plain
@@ -153,8 +166,11 @@ fn extract_body(parsed: &mailparse::ParsedMail) -> Option<String> {
 
     // Fallback to text/html if no plain text found (or first part if nothing else)
     if parsed.ctype.mimetype == "text/html" {
-         // Naive stripping of HTML tags could be done here, or just return as is.
-         return parsed.get_body().ok(); 
+         if let Ok(html_content) = parsed.get_body() {
+             if let Ok(md) = html2text::from_read(html_content.as_bytes(), 80) {
+                 return Some(clean_body(&md));
+             }
+         }
     }
 
     None
