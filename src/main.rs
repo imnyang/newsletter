@@ -89,7 +89,11 @@ fn run_monitor(config: &Config) -> Result<(), Box<dyn std::error::Error>> {
 
                     // Truncate body if too long for Discord (limit is 2000 chars)
                     let display_body = if body_content.len() > 1500 {
-                        format!("{}...", &body_content[..1500])
+                        let mut end = 1500;
+                        while !body_content.is_char_boundary(end) {
+                            end -= 1;
+                        }
+                        format!("{}...", &body_content[..end])
                     } else {
                         body_content
                     };
